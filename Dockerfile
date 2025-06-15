@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Install system dependencies
 RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev \
-    && apk add --no-cache jpeg-dev zlib-dev
+    && apk add --no-cache jpeg-dev zlib-dev curl
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
