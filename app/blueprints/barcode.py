@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, jsonify, make_response, render_template
 import barcode
 from barcode.writer import ImageWriter
 from io import BytesIO
@@ -19,21 +19,30 @@ class BarcodeGenerator:
         self.logger = SimpleLogger(self.__class__.__name__)
     
     def validate_request(self, data, barcode_type):
-        """Validate barcode generation request parameters."""
+        """Validate barcode generation request parameters.
+        
+        Returns:
+            tuple: (is_valid, (error_response, status_code, show_form))
+                  - is_valid: Boolean indicating if the request is valid
+                  - error_response: Error response dict if not valid
+                  - status_code: HTTP status code if not valid
+                  - show_form: Boolean indicating if the form should be shown
+        """
         self.logger.debug(f"Validating request for barcode type: {barcode_type}")
         
         if not data:
-            error_msg = "Missing required parameter 'data'"
-            self.logger.error(error_msg)
-            return False, ({"error": error_msg}, 400)
-        
+            self.logger.debug("No data provided, showing form")
+            return False, (None, None, True)  # (error_response, status_code, show_form)
+            
         if barcode_type not in self.SUPPORTED_TYPES:
             error_msg = f"Unsupported barcode type: {barcode_type}"
             self.logger.error(error_msg)
             return False, ({
                 "error": error_msg,
                 "supported_types": self.SUPPORTED_TYPES
-            }, 400)
+            }, 400, False)
+            
+        return True, (None, None, False)
         
         return True, (None, None)
     
@@ -179,9 +188,15 @@ def generate_barcode():
                 writer_options[param] = value
     
     # Validate request
-    is_valid, error_response = barcode_generator.validate_request(data, barcode_type)
-    if not is_valid:
-        return error_response
+    is_valid, (error_response, status_code, show_form) = barcode_generator.validate_request(data, barcode_type)
+    
+    # If we should show the form (no data provided)
+    if show_form:
+        return render_template('barcode_form.html')
+        
+    # If there's an error response
+    if error_response is not None:
+        return jsonify(error_response), status_code
     
     try:
         result = barcode_generator.generate_barcode(data, barcode_type, raw, **writer_options)

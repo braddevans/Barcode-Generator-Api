@@ -16,7 +16,9 @@ from .app_logging import logger, SimpleLogger, Colors, log, get_client_ip
 logger = SimpleLogger(__name__)
 
 def create_app():
-    app = Flask(__name__)
+    # Get the absolute path to the templates directory
+    template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
+    app = Flask(__name__, template_folder=template_dir)
     
     # Configure logging
     import logging
