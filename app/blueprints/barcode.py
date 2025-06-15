@@ -87,12 +87,22 @@ class BarcodeGenerator:
             
             # Add guard bars for EAN/UPC barcodes if requested
             if writer_options.get('guardbar', False) and barcode_type in ['ean8', 'ean13', 'ean', 'upc', 'upca']:
-                if not hasattr(barcode_instance, 'add_guard_bar'):
-                    self.logger.warning(f"Guard bars not supported for barcode type: {barcode_type}")
-                else:
+                # For EAN13, we need to use the renderer to add guard bars
+                if barcode_type == 'ean13':
+                    from barcode.ean import EAN13
+                    if isinstance(barcode_instance, EAN13):
+                        guardbar_height = float(writer_options.get('guardbar_height', 1.0))
+                        # Get the renderer and set guard bar height
+                        renderer = barcode_instance.writer
+                        renderer.guardbar_height = guardbar_height
+                        self.logger.debug(f"Set guard bar height to {guardbar_height} for EAN13")
+                elif hasattr(barcode_instance, 'add_guard_bar'):
+                    # For other barcode types that support add_guard_bar
                     guardbar_height = float(writer_options.get('guardbar_height', 1.0))
                     barcode_instance.add_guard_bar(guardbar_height)
                     self.logger.debug(f"Added guard bars with height factor: {guardbar_height}")
+                else:
+                    self.logger.warning(f"Guard bars not supported for barcode type: {barcode_type}")
             
             # Save to bytes buffer
             buffer = BytesIO()
