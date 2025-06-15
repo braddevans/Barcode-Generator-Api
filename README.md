@@ -1,31 +1,42 @@
 # Barcode Generator API
 
-A simple Flask-based API that generates barcodes in various formats and returns them as base64-encoded images.
+A simple Flask-based API that generates barcodes in various formats and returns them as base64-encoded images or raw PNGs.
 
 ## Features
 
 - Generate barcodes in multiple formats (Code128, EAN, UPC, ISBN, etc.)
 - Returns barcodes as base64-encoded images or raw PNG
+- Simple console logging for easy debugging
 - Containerized with Docker for easy deployment
-- Production-ready configuration with Gunicorn and Uvicorn
-- Health check endpoint
-- Comprehensive logging
+- Production-ready configuration with Gunicorn
+- Lightweight and fast
 
 ## Prerequisites
 
-- Python 3.8+
+- Python 3.13+
 - Docker (for containerized deployment)
 - pip (Python package manager)
 
 ## Local Development Setup
 
-1. Create a virtual environment:
+1. Clone the repository:
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   git clone <repository-url>
+   cd BarcodeApp
    ```
 
-2. Install dependencies:
+2. Create and activate a virtual environment:
+   ```bash
+   # Linux/Mac
+   python -m venv venv
+   source venv/bin/activate
+   
+   # Windows
+   python -m venv venv
+   .\venv\Scripts\activate
+   ```
+
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
@@ -39,15 +50,81 @@ python wsgi.py
 ```
 
 The API will be available at `http://localhost:5000`
-- Base URL: `http://localhost:5000`
-- API Endpoint: `http://localhost:5000/barcode`
-- Health Check: `http://localhost:5000/health`
-- Root URL: `http://localhost:5000/` (shows a welcome message)
 
-### Production Mode with Docker
+### Using the API
 
-1. Build and start the container:
-   ```bash
+1. **Get API Status**
+   ```
+   GET /
+   ```
+   Returns API status and available endpoints.
+
+2. **Generate Barcode**
+   ```
+   GET /barcode?data=TEST123&type=code128&raw=false
+   ```
+   - `data` (required): The data to encode in the barcode
+   - `type` (optional): Barcode type (default: code128)
+   - `raw` (optional): If true, returns raw PNG image (default: false)
+
+## Docker Deployment
+
+### Building the Docker Image
+
+```bash
+docker build -t barcode-api .
+```
+
+### Running with Docker Compose (Recommended)
+
+```bash
+docker-compose up -d
+```
+
+This will start the API at `http://localhost:8000`
+
+### Environment Variables
+
+- `HOST`: Host to bind to (default: 0.0.0.0)
+- `PORT`: Port to run on (default: 8000)
+- `FLASK_ENV`: Environment (development/production)
+- `DEBUG`: Enable debug mode (true/false)
+
+## API Endpoints
+
+- `GET /` - API status and documentation
+- `GET /barcode` - Generate a barcode
+
+## Barcode Types
+
+Supported barcode types include:
+- code128 (default)
+- ean
+- ean13
+- ean8
+- gs1
+- gtin
+- isbn10
+- isbn13
+- issn
+- upc
+- upca
+
+## Examples
+
+### Generate a Code128 barcode (JSON response)
+```
+GET /barcode?data=TEST123
+```
+
+### Generate an EAN13 barcode (raw PNG)
+```
+GET /barcode?data=5901234123457&type=ean13&raw=true
+```
+
+## Logs
+
+Logs are written to the `logs/` directory when running in a container.
    docker-compose up -d --build
    ```
 

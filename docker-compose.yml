@@ -1,27 +1,24 @@
 version: '3.8'
 
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: barcode-app
+  barcode-api:
+    build: .
+    container_name: barcode-api
     restart: unless-stopped
     environment:
+      - FLASK_APP=wsgi:app
+      - FLASK_ENV=production
       - HOST=0.0.0.0
       - PORT=8000
       - DEBUG=false
-      - PYTHONUNBUFFERED=1
     ports:
       - "8000:8000"
-    volumes:
-      - ./logs:/app/logs
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 5s
+      start_period: 10s
     networks:
       - app-network
 
