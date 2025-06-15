@@ -2,41 +2,91 @@
 
 A simple Flask-based API that generates barcodes in various formats and returns them as base64-encoded images.
 
-## Setup
+## Features
 
-1. Create a virtual environment (recommended):
-   ```
+- Generate barcodes in multiple formats (Code128, EAN, UPC, ISBN, etc.)
+- Returns barcodes as base64-encoded images or raw PNG
+- Containerized with Docker for easy deployment
+- Production-ready configuration with Gunicorn and Uvicorn
+- Health check endpoint
+- Comprehensive logging
+
+## Prerequisites
+
+- Python 3.8+
+- Docker (for containerized deployment)
+- pip (Python package manager)
+
+## Local Development Setup
+
+1. Create a virtual environment:
+   ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 2. Install dependencies:
-   ```
+   ```bash
    pip install -r requirements.txt
    ```
 
 ## Running the Application
 
-1. Install dependencies:
-   ```
-   pip install -r requirements.txt
+### Development Mode
+
+```bash
+python wsgi.py
+```
+
+The API will be available at `http://localhost:5000`
+- Base URL: `http://localhost:5000`
+- API Endpoint: `http://localhost:5000/barcode`
+- Health Check: `http://localhost:5000/health`
+- Root URL: `http://localhost:5000/` (shows a welcome message)
+
+### Production Mode with Docker
+
+1. Build and start the container:
+   ```bash
+   docker-compose up -d --build
    ```
 
-2. Run the application:
-   ```
-   python wsgi.py
-   ```
+2. The API will be available at `http://localhost:8000`
+   - Base URL: `http://localhost:8000`
+   - API Endpoint: `http://localhost:8000/barcode`
+   - Health Check: `http://localhost:8000/health`
 
-3. The API will be available at `http://localhost:5000`
-   - Base URL: `http://localhost:5000`
-   - API Endpoint: `http://localhost:5000/api/barcode`
-   - Root URL: `http://localhost:5000/` (shows a welcome message)
+### Managing the Docker Container
+
+- View logs:
+  ```bash
+  docker-compose logs -f
+  ```
+
+- Stop the container:
+  ```bash
+  docker-compose down
+  ```
+
+- Rebuild the container (after making changes):
+  ```bash
+  docker-compose up -d --build
+  ```
+
+## Environment Variables
+
+| Variable  | Default | Description |
+|-----------|---------|-------------|
+| HOST      | 0.0.0.0 | Host to bind the server to |
+| PORT      | 8000    | Port to run the server on |
+| DEBUG     | false   | Enable debug mode |
+| LOG_LEVEL | INFO    | Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL) |
 
 ## Usage
 
 ### Generate a Barcode
 
-Make a GET request to `/api/barcode` with the following query parameters:
+Make a GET request to `/barcode` with the following query parameters:
 
 - `data` (required): The data to encode in the barcode
 - `type` (optional): The type of barcode (default: code128)
@@ -57,12 +107,12 @@ Make a GET request to `/api/barcode` with the following query parameters:
 
 **JSON Response (default):**
 ```
-GET /api/barcode?data=123456789012&type=code128
+GET /barcode?data=123456789012&type=code128
 ```
 
 **Raw Image Response:**
 ```
-GET /api/barcode?data=123456789012&type=code128&raw=true
+GET /barcode?data=123456789012&type=code128&raw=true
 ```
 
 ### Example Response
