@@ -1,13 +1,12 @@
-# Use Python 3.13 slim image
-FROM python:3.13-slim
+# Use Python 3.13 Alpine image
+FROM python:3.13-alpine
 
 # Set working directory
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev \
+    && apk add --no-cache jpeg-dev zlib-dev
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -25,11 +24,14 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir gunicorn && \
     pip install --no-cache-dir -r requirements.txt
 
+# Remove build dependencies
+RUN apk del .build-deps
+
 # Copy application code
 COPY . .
 
 # Create non-root user and switch to it
-RUN useradd -m myuser && \
+RUN adduser -D myuser && \
     chown -R myuser:myuser /app
 USER myuser
 
