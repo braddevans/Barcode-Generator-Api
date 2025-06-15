@@ -18,13 +18,29 @@ logger = SimpleLogger(__name__)
 def create_app():
     app = Flask(__name__)
     
+    # Configure logging
     import logging
-    log = logging.getLogger('werkzeug')
-    log.setLevel(logging.ERROR)
     
     # Disable Flask's default request logging
+    logging.getLogger('werkzeug').setLevel(logging.ERROR)
+    logging.getLogger('werkzeug').disabled = True
+    
+    # Completely disable ASGI/UVICORN logging
+    logging.getLogger('uvicorn').handlers = []
+    logging.getLogger('uvicorn').propagate = False
+    logging.getLogger('uvicorn.access').handlers = []
+    logging.getLogger('uvicorn.access').propagate = False
+    logging.getLogger('uvicorn.error').handlers = []
+    logging.getLogger('uvicorn.error').propagate = False
+    
+    # Disable Flask's default logger
     app.logger.disabled = True
-    log.disabled = True
+    
+    # Disable other noisy loggers
+    logging.getLogger('asyncio').setLevel(logging.WARNING)
+    logging.getLogger('hpack').setLevel(logging.WARNING)
+    logging.getLogger('httpcore').setLevel(logging.WARNING)
+    logging.getLogger('httpx').setLevel(logging.WARNING)
 
     # Import and register blueprints
     from .blueprints import barcode

@@ -152,16 +152,16 @@ def log(message, level="INFO", **kwargs):
     # Print the formatted message
     print(" ".join(log_parts), file=output, **kwargs)
     
-    # If we have extra data and not in a request context (to avoid recursion)
-    if extra and 'request' not in extra:
-        import json
-        import textwrap
-        # Convert extra data to pretty-printed JSON
-        extra_json = json.dumps(extra, indent=2, default=str)
-        # Indent and color the extra data
-        formatted_extra = textwrap.indent(extra_json, '  ')
-        print(f"{Colors.BG_GRAY}{formatted_extra}{Colors.RESET}", file=output)
-    
+    # # If we have extra data and not in a request context (to avoid recursion)
+    # if extra and 'request' not in extra:
+    #     import json
+    #     import textwrap
+    #     # Convert extra data to pretty-printed JSON
+    #     extra_json = json.dumps(extra, indent=2, default=str)
+    #     # Indent and color the extra data
+    #     formatted_extra = textwrap.indent(extra_json, '  ')
+    #     print(f"{Colors.BG_GRAY}{formatted_extra}{Colors.RESET}", file=output)
+    #
     # Flush to ensure logs appear immediately
     output.flush()
 

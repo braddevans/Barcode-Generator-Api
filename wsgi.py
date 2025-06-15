@@ -18,13 +18,8 @@ app = create_app()
 
 
 def print_banner() -> None:
-    """Print a beautiful ASCII art banner."""
-    banner = f"""
-{Colors.CYAN}╔══════════════════════════════════════════════════════════════╗
-║{Colors.BOLD}{Colors.GREEN}            BARCODE GENERATOR API - v1.0.0{Colors.RESET}{Colors.CYAN}            ║
-║{Colors.GRAY}      Generate barcodes with a simple HTTP API{Colors.CYAN}             ║
-╚══════════════════════════════════════════════════════════════╝{Colors.RESET}"""
-    print(banner)
+    """Print a blank line for consistency (banner removed)."""
+    print()
 
 
 def get_system_info(host: str, port: int, debug: bool) -> List[Tuple[str, str]]:
